@@ -1,9 +1,7 @@
 name: Deploy to Koyeb
 
 on:
-  push:
-    branches:
-      - main  # Change this to your branch
+  workflow_dispatch:  # Allows you to manually trigger the workflow from GitHub UI
 
 jobs:
   deploy:
@@ -13,36 +11,26 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v2
 
-    - name: Install dependencies
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y curl
-
-    - name: Cache Koyeb CLI
-      id: koyeb_cache
-      uses: actions/cache@v3
+    - name: Log in to GitHub Container Registry
+      uses: docker/login-action@v2
       with:
-        path: ~/.koyeb
-        key: ${{ runner.os }}-koyeb-${{ hashFiles('**/koyeb-cli.sh') }}
-        restore-keys: |
-          ${{ runner.os }}-koyeb-
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+        registry: ghcr.io  # Using GitHub Container Registry
 
-    - name: Install or Update Koyeb CLI
+    - name: Pull Docker image from GitHub Container Registry
       run: |
-        if ! command -v koyeb &> /dev/null; then
-          echo "Koyeb CLI not found, installing..."
-          curl -fsSL https://raw.githubusercontent.com/koyeb/koyeb-cli/master/install.sh | sh
-        else
-          echo "Koyeb CLI found, updating..."
-          sudo koyeb update
-        fi
-        echo 'export PATH="$HOME/.koyeb/bin:$PATH"' >> $GITHUB_ENV
-        source $GITHUB_ENV
-        echo "PATH is: $PATH"
-        command -v koyeb
+        docker pull ghcr.io/redgale/dockefileforai:latest  # Replace with your actual image name
+
+    - name: Install Koyeb CLI
+      run: |
+        curl -fsSL https://raw.githubusercontent.com/koyeb/koyeb-cli/master/install.sh | sh
+        koyeb --version  # Verify Koyeb CLI installation
 
     - name: Log in to Koyeb CLI
-      run: koyeb login --token ${{ secrets.KOYEB_API_TOKEN }}
+      run: |
+        koyeb login --token ${{ secrets.KOYEB_API_TOKEN }}  # Use your Koyeb API Token stored in GitHub Secrets
 
     - name: Deploy to Koyeb
-      run: koyeb app update --image ghcr.io/redgale/dockefileforai:latest --name ai-website  # App name updated to 'ai-website'
+      run: |
+        koyeb app update --image ghcr.io/redgale/dockefileforai:latest --name ai-website  # Replace with your app name
