@@ -11,7 +11,7 @@ jobs:
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v2.4.0  # Specify exact version
+      uses: actions/checkout@v2
 
     - name: Install dependencies
       run: |
@@ -20,7 +20,7 @@ jobs:
 
     - name: Cache Koyeb CLI
       id: koyeb_cache
-      uses: actions/cache@v2.1.6  # Specify a working version
+      uses: actions/cache@v3
       with:
         path: ~/.koyeb
         key: ${{ runner.os }}-koyeb-${{ hashFiles('**/koyeb-cli.sh') }}
