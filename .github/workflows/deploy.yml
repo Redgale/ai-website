@@ -20,4 +20,4 @@ jobs:
 
     - name: Deploy to Koyeb
       run: |
-        koyeb app update --image ghcr.io/redgale/dockefileforai:latest --name <ai-website>
+        koyeb app update --image ghcr.io/redgale/dockefileforai:latest --name ai-website  # App name updated to 'ai-website'
