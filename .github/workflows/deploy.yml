@@ -37,6 +37,7 @@ jobs:
           sudo koyeb update
         fi
         echo 'export PATH="$HOME/.koyeb/bin:$PATH"' >> $GITHUB_ENV
+        source $GITHUB_ENV
 
     - name: Log in to Koyeb CLI
       run: koyeb login --token ${{ secrets.KOYEB_API_TOKEN }}
