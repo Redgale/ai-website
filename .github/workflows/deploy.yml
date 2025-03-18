@@ -11,23 +11,35 @@ jobs:
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v2
+      uses: actions/checkout@v2.4.0  # Specify exact version
 
     - name: Install dependencies
-      run: sudo apt-get update && sudo apt-get install -y curl
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y curl
+
+    - name: Cache Koyeb CLI
+      id: koyeb_cache
+      uses: actions/cache@v2
+      with:
+        path: ~/.koyeb
+        key: ${{ runner.os }}-koyeb-${{ hashFiles('**/koyeb-cli.sh') }}
+        restore-keys: |
+          ${{ runner.os }}-koyeb-
+
+    - name: Install or Update Koyeb CLI
+      run: |
+        if ! command -v koyeb &> /dev/null; then
+          echo "Koyeb CLI not found, installing..."
+          wget https://cli.koyeb.com -O koyeb-cli.sh && sudo bash koyeb-cli.sh
+        else
+          echo "Koyeb CLI found, updating..."
+          sudo koyeb update
+        fi
+        koyeb --version
 
     - name: Log in to Koyeb CLI
-      run: |
-        # Check if Koyeb CLI is already installed
-        if ! command -v koyeb &> /dev/null
-        then
-            echo "Koyeb CLI not found, installing..."
-            # Alternative installation method
-            wget https://cli.koyeb.com -O koyeb-cli.sh && sudo bash koyeb-cli.sh
-        fi
-        koyeb --version  # Verify Koyeb CLI installation
-        koyeb login --token ${{ secrets.KOYEB_API_TOKEN }}  # Use Koyeb API Token from Secrets
+      run: koyeb login --token ${{ secrets.KOYEB_API_TOKEN }}
 
     - name: Deploy to Koyeb
-      run: |
-        koyeb app update --image ghcr.io/redgale/dockefileforai:latest --name ai-website  # App name updated to 'ai-website'
+      run: koyeb app update --image ghcr.io/redgale/dockefileforai:latest --name ai-website  # App name updated to 'ai-website'
