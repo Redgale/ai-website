@@ -1,0 +1,23 @@
+name: Deploy to Koyeb
+
+on:
+  push:
+    branches:
+      - main  # Change this to your branch
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Log in to Koyeb CLI
+      run: |
+        curl -sSL https://cli.koyeb.com | sudo bash
+        koyeb login --token ${{ secrets.KOYEB_API_TOKEN }}  # Use Koyeb API Token from Secrets
+
+    - name: Deploy to Koyeb
+      run: |
+        koyeb app update --image ghcr.io/redgale/dockefileforai:latest --name <ai-website>
