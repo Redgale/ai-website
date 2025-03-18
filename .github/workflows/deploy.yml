@@ -16,6 +16,7 @@ jobs:
     - name: Log in to Koyeb CLI
       run: |
         curl -sSL https://cli.koyeb.com | sudo bash
+        koyeb --version  # Verify Koyeb CLI installation
         koyeb login --token ${{ secrets.KOYEB_API_TOKEN }}  # Use Koyeb API Token from Secrets
 
     - name: Deploy to Koyeb
