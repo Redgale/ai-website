@@ -38,6 +38,8 @@ jobs:
         fi
         echo 'export PATH="$HOME/.koyeb/bin:$PATH"' >> $GITHUB_ENV
         source $GITHUB_ENV
+        echo "PATH is: $PATH"
+        command -v koyeb
 
     - name: Log in to Koyeb CLI
       run: koyeb login --token ${{ secrets.KOYEB_API_TOKEN }}
