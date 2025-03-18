@@ -31,7 +31,7 @@ jobs:
       run: |
         if ! command -v koyeb &> /dev/null; then
           echo "Koyeb CLI not found, installing..."
-          wget https://cli.koyeb.com -O koyeb-cli.sh && sudo bash koyeb-cli.sh
+          curl -fsSL https://raw.githubusercontent.com/koyeb/koyeb-cli/master/install.sh | sh
         else
           echo "Koyeb CLI found, updating..."
           sudo koyeb update
