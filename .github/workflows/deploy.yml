@@ -3,36 +3,15 @@ name: Deploy to Koyeb
 on:
   push:
     branches:
-      - main  # You can change this to the branch you are working with
+      - main
 
 jobs:
-  deploy:
+  build:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
-
-      - name: Log in to GitHub Container Registry
-        uses: docker/login-action@v2
-        with:
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-          registry: ghcr.io
-
-      - name: Build Docker image
-        run: |
-          cd frontend  # Corrected the directory to 'frontend'
-          docker build --no-cache --progress=plain -t ghcr.io/redgale/dockefileforai:latest .
-
-      - name: Push Docker image to GitHub Container Registry
-        run: |
-          docker push ghcr.io/redgale/dockefileforai:latest
-
-      - name: Deploy to Koyeb
-        run: |
-          curl -sSL https://cli.koyeb.com | sudo bash
-          koyeb app update --image ghcr.io/redgale/dockefileforai:latest --name ai-website
+    - uses: actions/checkout@v2
+    - name: Build and Deploy
+      run: |
+        docker build -t my-app .
+        docker run my-app
