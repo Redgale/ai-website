@@ -38,7 +38,6 @@ jobs:
         fi
         echo 'export PATH="$HOME/.koyeb/bin:$PATH"' >> $HOME/.bash_profile
         source $HOME/.bash_profile
-        koyeb --version
 
     - name: Log in to Koyeb CLI
       run: koyeb login --token ${{ secrets.KOYEB_API_TOKEN }}
