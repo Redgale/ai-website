@@ -1,48 +1,38 @@
-name: Build and Deploy Docker Image to Koyeb
+name: Deploy to Koyeb
 
 on:
   push:
     branches:
-      - main  # Change this if you're using a different branch (e.g., master)
+      - main  # You can change this to the branch you are working with
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
-
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
-
-    - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v2
-
-    - name: Log in to GitHub Container Registry
-      uses: docker/login-action@v2
-      with:
-        username: ${{ github.actor }}
-        password: ${{ secrets.GITHUB_TOKEN }}
-        registry: ghcr.io  # Ensure you're using GitHub Container Registry (GHCR)
-
-    - name: Build Docker image
-      run: |
-        docker build --no-cache --progress=plain -t ghcr.io/redgale/dockefileforai:latest .
-        
-    - name: Push Docker image to GitHub Container Registry
-      run: |
-        docker push ghcr.io/redgale/dockefileforai:latest
-
   deploy:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Wait for image push to complete
-      run: echo "Waiting for Docker image to be pushed..."
+      - name: Checkout code
+        uses: actions/checkout@v2
 
-    - name: Deploy to Koyeb
-      run: |
-        curl -X POST "https://api.koyeb.com/v1/apps/ai-website/deployments" \
-          -H "Authorization: Bearer ${{ secrets.KOYEB_API_TOKEN }}" \
-          -d '{
-            "image": "ghcr.io/redgale/dockefileforai:latest",
-            "environment": "production"
-          }'
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v2
+        with:
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+          registry: ghcr.io
+
+      - name: Build Docker image
+        run: |
+          cd fronthead  # Change to the fronthead directory where your Dockerfile is
+          docker build --no-cache --progress=plain -t ghcr.io/redgale/dockefileforai:latest .
+
+      - name: Push Docker image to GitHub Container Registry
+        run: |
+          docker push ghcr.io/redgale/dockefileforai:latest
+
+      - name: Deploy to Koyeb
+        run: |
+          curl -sSL https://cli.koyeb.com | sudo bash
+          koyeb app update --image ghcr.io/redgale/dockefileforai:latest --name ai-website
