@@ -13,9 +13,17 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v2
 
+    - name: Install dependencies
+      run: sudo apt-get update && sudo apt-get install -y curl
+
     - name: Log in to Koyeb CLI
       run: |
-        curl -sSL https://cli.koyeb.com | sudo bash
+        # Check if Koyeb CLI is already installed
+        if ! command -v koyeb &> /dev/null
+        then
+            echo "Koyeb CLI not found, installing..."
+            curl -sSL https://cli.koyeb.com | sudo bash
+        fi
         koyeb --version  # Verify Koyeb CLI installation
         koyeb login --token ${{ secrets.KOYEB_API_TOKEN }}  # Use Koyeb API Token from Secrets
 
