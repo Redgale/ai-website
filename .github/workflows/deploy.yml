@@ -36,6 +36,8 @@ jobs:
           echo "Koyeb CLI found, updating..."
           sudo koyeb update
         fi
+        echo 'export PATH="$HOME/.koyeb/bin:$PATH"' >> $HOME/.bash_profile
+        source $HOME/.bash_profile
         koyeb --version
 
     - name: Log in to Koyeb CLI
