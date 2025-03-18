@@ -22,7 +22,8 @@ jobs:
         if ! command -v koyeb &> /dev/null
         then
             echo "Koyeb CLI not found, installing..."
-            curl -sSL https://cli.koyeb.com | sudo bash
+            # Alternative installation method
+            wget https://cli.koyeb.com -O koyeb-cli.sh && sudo bash koyeb-cli.sh
         fi
         koyeb --version  # Verify Koyeb CLI installation
         koyeb login --token ${{ secrets.KOYEB_API_TOKEN }}  # Use Koyeb API Token from Secrets
